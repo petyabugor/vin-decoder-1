@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Search } from '../../components/common/index';
 import styles from './Home.module.scss';
 import { useState } from 'react';
@@ -11,8 +11,9 @@ function Home({
    setValueFromButtonClick,
    products,
 }) {
-   const [list, setList] = useState([]);
-
+   const [list, setList] = useState(JSON.parse(localStorage.getItem('vin')) || []);
+   const isMounted = useRef(false);
+   console.log(list);
    const item = products.filter((obj) => {
       if (obj.Value) {
          return true;
@@ -27,8 +28,12 @@ function Home({
       );
    };
 
-   const vin = localStorage.getItem('vin') ? JSON.parse(localStorage.getItem('vin')) : [];
-   vin.push(valueFromButtonClick);
+   useEffect(() => {
+      if (isMounted.current) {
+         localStorage.setItem('vin', JSON.stringify(list));
+      }
+      isMounted.current = true;
+   }, [list]);
 
    const changeValue = (obj) => {
       setValueFromButtonClick(obj);
@@ -55,8 +60,8 @@ function Home({
             <h4 className={styles.title}>Останні запити</h4>
 
             <div className={styles.list}>
-               {valueFromButtonClick
-                  ? vin.slice(Math.max(vin.length - 5, 0)).map((obj, index) => (
+               {list
+                  ? list.slice(Math.max(list.length - 5, 0)).map((obj, index) => (
                        <div
                           key={index}
                           className={styles.listItem}
@@ -69,15 +74,15 @@ function Home({
                     ))
                   : showNothing()}
             </div>
-            {valueFromButtonClick && (
+            {list && (
                <div className={styles.title}>
                   <h4 className={styles.title}>
-                     Результат розшифровки він кода: {vin.slice(Math.max(vin.length - 1, 0))}
+                     Результат розшифровки він кода: {list.slice(Math.max(list.length - 1, 0))}
                   </h4>
                </div>
             )}
 
-            {valueFromButtonClick &&
+            {list &&
                item.map((obj) => (
                   <div
                      className={styles.characteristic}

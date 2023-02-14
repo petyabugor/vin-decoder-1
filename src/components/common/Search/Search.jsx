@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import styles from './Search.module.scss';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { IoCloseOutline } from 'react-icons/io5';
@@ -13,31 +13,27 @@ function Form({
    setList,
 }) {
    const [message, setMessage] = useState('');
-   const vinValidation = () => {
+
+
+   const vinValidation = (event) => {
+      event.preventDefault();
       const regEx = /^(?=.*[0-9])(?=.*[A-z])[0-9A-z-]{17}$/g;
       if (!regEx.test(searchValue)) {
          setMessage('Vin is Not Valid');
       } else {
+         setValueFromButtonClick(searchValue);
          setMessage('');
-      }
-   };
-   const handleClick = (event) => {
-      setValueFromButtonClick(searchValue);
 
-      if (searchValue) {
          setList((ls) => [...ls, searchValue]);
-         localStorage.setItem('vin', JSON.stringify(list));
-      } else {
-         return false;
+
+         
       }
-      setSearchValue('');
-      event.preventDefault();
    };
 
    return (
       <div className={styles.root}>
          <form
-            onSubmit={handleClick}
+            onSubmit={vinValidation}
             className={styles.form}
          >
             <div className={styles.inputWrapper}>
@@ -59,7 +55,7 @@ function Form({
             <div className={styles.buttonWrapper}>
                <AiOutlineSearch className={styles.icon} />
                <button
-                  onClick={vinValidation}
+                  /*  onClick={vinValidation} */
                   type="submit"
                   className={styles.button}
                >
